@@ -1,0 +1,57 @@
+#+OPTIONS: ^:{}
+#+TITLE: MDM9615 Wifi 笔记
+#+AUTHOR:xiandong.zhang 
+#+EMAIL:zhangxd1224@thundersoft.com
+
+* kernel 修改点
+ kerne相关的修改点主要为从新config内核,按照以下步骤即可
+** 清除掉以前老的内核及其相关文件：bitbake -c clean linux-quic
+<<注>>linux-quic 为mdm9615代码使用的内核，在oe配置文件中可以查看：xxx/apps_proc/oe-core/meta-msm/conf/machine/9615-cdp.conf
+** 修改内核.config文件,
+内核在编译的时候:bitbake linux-quic 会执行configure动作
+#+BEGIN_SRC sh
+do_configure(){
+    mkdir -p ${STAGING_KERNEL_DIR}
+	rm -rf ${STAGING_KERNEL_DIR}/*
+	rm -rf ${O}
+	ln -s ${STAGING_KERNEL_DIR} ${O}
+#  oe_runmake ${KERNEL_DEFCONFIG} O=${O}
+    cp ${S}/${KERNEL_DEFCONFIG} ${O}/.config
+}
+#+END_SRC
+自动完成配置，在
+xx/apps_porc/oe-core/meta-msm/recipes/linux-quic/linux-quic_git.bb
+文件中可以找到其自动配置方法：
+
+注释掉oe_runmake 行,其功能相当切换到内核kernel目录下执行：make ARCH=arm msm9615-defconfig O=目标文件路径。
+添加 cp ${$} .. 行,即编译内核之前到内核根目录下直接拷贝msm9615-defconfig 到目标文件路径做为内核配置文件。
+** 动生成生成msm9615-defconfig
+*** 在内核源码根目录下执行：make ARCH=armmsm9615-defconfig 既可在该目录下生成.config文件
+*** 在内核源码根目录下执行：make ARCH=arm menuconfig 对内核进行配置，退出时选择保存
+*** 在内核源码路径下执行 cp .config msm9615-defconfig
+*** 在oe-core的build目录下执行：bitbake linux-quic  -->生成kernel 镜像
+*** 在oe-core的build目录下执行：bitbake build9615 --->生成所有镜像
+* rootfs 相关修改点
+** 拷贝wifi模块驱动文件到根文件系统
+   adb push  ar6000.ko /lib/modules/
+** 拷贝wifi模块fw文件到根文件系统 
+   adb push -r ark /home/
+** 拷贝dnsmasq配置文件到根文件系统 
+   adb push dnsmasq.conf /etc/
+** 拷贝hostapd配置文件到根文件系统
+   adb push wpa-tkip.conf /etc/
+** 拷贝wifi启动脚本到根文件系统  
+   adb push start.sh /etc/init.d/
+** 添加wifi自启动任务， 在/etc/rc5.d 下执行
+   ln -s /etc/init.d/start.sh S98start_hostap
+
+
+
+
+
+
+
+
+
+
+

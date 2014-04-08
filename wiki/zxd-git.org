@@ -1,0 +1,68 @@
+#+OPTIONS: ^:{}
+#+TITLE: git 笔记
+#+AUTHOR:xiandong.zhang 
+#+EMAIL:zhangxd1224@thundersoft.com
+
+
+
+* git 使用前的配置
+git 配置文件中包含git使用的环境变量，配置文件可以存放在以下
+三个不同的地方。
+
+** 所有用户适用配置
+   /etc/gitconfig ---> 系统中所有用户都普遍适用的配置,若使用
+   git config 时添加--system选项,操作的就是这个文件
+
+** 单个用户适用配置
+   ~/.gitconfig ---> 用户目录下的配置文件只适用于该用户,若使
+   用git config 时添加 --global选项,读写的就是这个文件.
+
+** 单个项目的git适用于当前项目
+   .git/config ---> 项目目录下的配置文件仅仅针对当前项目有效.
+
+【注】 每一个级别的配置都会覆盖上层的相同配置,即.git/config
+会覆盖~/.gitconfig 里面的变量
+
+** 配置用户信息
+   配置用户名称和电子邮件地址很重要,每次git提交都会引用这两
+   头信息,说明是谁提交了更新,所以会随跟新内容一起永久纳入历
+   史记录
+   
+   $git config --global user.name "zxd"
+   $git config --global user.email zhangxd1224@thundersoft.com
+
+   
+** 配置工具
+   
+*** 配置文笔编辑器
+	$git config --global core.editor emacs
+
+*** 配置差异分析工具
+	$git config --global merge.tool vimdiff
+
+** 察看相关配置信息
+    $ git config --list
+	$git config user.name
+
+
+
+* git 基础
+  简单介绍git的常用命令
+** 获取项目的git仓库
+   获取项目git仓库有两种方式
+*** 从当前目录初始化
+	$git init
+	初始化,在当前目录下创建一个.git目录，所有git需要的数据和
+	资源都存放在该目录下
+	$git add *
+	告诉git对该目录下所有文件进行跟踪
+	$git commit -m "fc"
+*** 从现有仓库克隆
+	$git clone https://github.com/zxd641326/emcas.git
+
+	在当前目录下创建一个名为emacs的目录,该目录下包含一个.git
+	目录
+	$git clone https://github.com/zxd641326/emacs.git
+	my_emacs
+** 记录更新到仓库
+

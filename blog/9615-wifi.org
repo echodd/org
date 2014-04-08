@@ -1,0 +1,50 @@
+#+OPTIONS: ^:{}
+#+TITLE: MDM9615 Wifi 代码更新笔记
+#+AUTHOR:xiandong.zhang 
+#+EMAIL:zhangxd1224@thundersoft.com
+9615-wifi 代码更新主要是为了在编译出来的代码中直接就支持
+wifi-hostapd功能,更新主要分为以下几个方面:
+* 添加新的package到要编译镜像中
+  在 xxxx/apps_proc/oe-core/meta-msm/recipes/images/9615-cdp-image.inc中添加新的安装包：
+  IMAGE_INSTALL += "wifi-host"
+
+* 添加编译package .bb文件
+  创建目录：xxxx/apps_proc/oe-core/meta-msm/recipes/wifi-host
+  在新创建目录下添加wifi-hot.bb文件,新文件内容如下
+
+#+BEGIN_SRC sh
+inherit autotools 
+DESCRIPTION = "9615 wifi"
+LICENSE = "BSD"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
+${LICENSE};md5=3775480a712fc46a69647678acb234cb"
+PR = "r0"
+
+SRC_URI = "file://${WORKSPACE}/external/9615-wifi/"
+
+do_install() {
+	 rm -rf  ${D}${sysconfdir}
+     mkdir -p ${D}${sysconfdir}/init.d/	 
+	 cp -rf ${WORKSPACE}/external/9615-wifi ${D}${sysconfdir}/init.d/
+}
+#+END_SRC
+
+* 添加package 处理的数据源文件 
+数据文件主要包含:wifi驱动和固件/hostapd配置文件/dnsmasq配置文件/wifi自启动脚本
+创建 xxx/apps_proc/external/9615-wifi目录,将要用到的文件拷贝新建目录下
+
+* 添加打包镜像时处理命令
+在xxx/apps_proc/oe-core/meta-qcom/recipes/images/9615-cdp-usr-image.inc:中包含mkyafffs2image 行之前添加以下内容
+
+#+BEGIN_SRC sh
+IMAGE_PREPROCESS_COMMAND += "chmod a+x -R ${IMAGE_ROOTFS}/etc/init.d/9615-wifi;"
+IMAGE_PREPROCESS_COMMAND += "mv ${IMAGE_ROOTFS}/etc/init.d/9615-wifi/dnsmasq.conf ${IMAGE_ROOTFS}/etc;"
+IMAGE_PREPROCESS_COMMAND += "mv ${IMAGE_ROOTFS}/etc/init.d/9615-wifi/wpa-tkip.conf ${IMAGE_ROOTFS}/etc;"
+IMAGE_PREPROCESS_COMMAND += "mv ${IMAGE_ROOTFS}/etc/init.d/9615-wifi/ath6k ${IMAGE_ROOTFS}/home;"
+IMAGE_PREPROCESS_COMMAND += "cd ${IMAGE_ROOTFS}/etc/rc5.d; ln -s /etc/init.d/9615-wifi/start.sh S98start_wifi_hostap ;"
+#+END_SRC
+
+
+
+
+

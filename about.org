@@ -1,0 +1,12 @@
+#+TITLE:       关于
+#+AUTHOR:      echodd
+#+EMAIL:       zxd641326@gmail.com
+#+DATE:        2014年 04月 08日 星期二 11:10:59 CST
+#+URI:         /about/
+#+KEYWORDS:    About, echodd, 关于
+#+LANGUAGE:    en
+#+OPTIONS:     H:3 num:nil toc:nil \n:nil @:t ::t |:t ^:nil -:t f:t *:t <:t
+#+DESCRIPTION: About echo dd
+
+
+试试！
